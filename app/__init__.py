@@ -1,38 +1,34 @@
-from markupsafe import escape
-
-from flask import Flask,render_template
-
-
-name = 'Grey Li'
-movies = [
-    {'title': 'My Neighbor Totoro', 'year': '1988'},
-    {'title': 'Dead Poets Society', 'year': '1989'},
-    {'title': 'A Perfect World', 'year': '1993'},
-    {'title': 'Leon', 'year': '1994'},
-    {'title': 'Mahjong', 'year': '1996'},
-    {'title': 'Swallowtail Butterfly', 'year': '1996'},
-    {'title': 'King of Comedy', 'year': '1999'},
-    {'title': 'Devils on the Doorstep', 'year': '1999'},
-    {'title': 'WALL-E', 'year': '2008'},
-    {'title': 'The Pork of Music', 'year': '2012'},
-]
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_bootstrap import Bootstrap5
+from flask_login import LoginManager
+from flask_avatars import Avatars
 
 
 app = Flask(__name__)
+app.config.from_pyfile("settings.py")
+db = SQLAlchemy(app)
+bootstrap = Bootstrap5(app)
+avatars = Avatars(app)
+login_manager = LoginManager(app)
+login_manager.login_view = "login"
 
-@app.route("/")
-def index():
-    return render_template("index.html",name=name,movies=movies)
+from app import commands,views,models,errors
+from app.models import User,Movie
 
-@app.route("/index")
-@app.route("/home")
-def hello_world():
-    return "<div><center><h1>Hello World!</h1></center></div>"
+@app.context_processor
+def inject_user():
+    user = User.query.first()
+    return dict(user=user)
 
-@app.route("/hello")
-def hello_totoro():
-    return '<center><h1>Hello Totoro!</h1><img src="http://helloflask.com/totoro.gif"></center>'
 
-@app.route("/user/<name>")
-def user_page(name):
-    return f"User: {escape(name)}"
+@login_manager.user_loader
+def load_user(user_id):
+    user = User.query.get(int(user_id))
+    return user
+
+
+
+
+
+

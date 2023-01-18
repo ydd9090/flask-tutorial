@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    {% block head %}
+    <meta charset="utf-8">
+    <!-- 兼容移动设备 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.name }}的观影清单</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" type="text/css">
+    {% endblock   %}
+
+</head>
+<body>
+    <div class="container">
+
+        {%for message in get_flashed_messages()%}
+        <div class="alert">{{message}}</div>
+    {%endfor%}
+    <h2>
+        <img alt="Avatar" class="avatar" src="{{ url_for('static', filename='images/avatar.png') }}">
+        {{ user.name }}的观影清单
+    </h2>
+    <nav class="text-center">
+        <ul>
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            {%if current_user.is_authenticated%}
+                <li><a href="{{url_for('logout')}}">Logout</a></li>
+            {%else%}
+                <li><a href="{{url_for('login')}}">Login</a></li>
+            {%endif%}
+            <li><a href="{{url_for('search')}}">Search</a></li>
+        </ul>
+    </nav>
+   
+    
+    {% block content %}{% endblock %}
+    <footer>
+        <small>&copy; 2018 <a href="http://helloflask.com/book/3">HelloFlask</a></small>
+    </footer>
+    </div>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

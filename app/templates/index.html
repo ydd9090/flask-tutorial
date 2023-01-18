@@ -1,21 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{name}}'s 电影清单</title>
-</head>
-<body>
-    <h2>{{name}}的电影观影清单</h2>
-    <p>{{movies | length}} Titles</p> <!--过滤器 https://jinja.palletsprojects.com/en/3.0.x/templates/#builtin-filters -->
-    <ul>
+{% extends "base.html" %}
+{% from "bootstrap/form.html" import render_form %}
+{%from "bootstrap/pagination.html" import render_pagination%}
+
+{%block content%}
+    <h3>共{{movies_count}}部电影🎬</h3>
+    {%if current_user.is_authenticated%}
+    <div>
+        {{render_form(form)}}
+    </div>
+    <hr/>
+    {%endif%}
+    
+    <ul class="movie-list">
         {%for movie in movies%}
-            <li>{{movie.title}} - {{movie.year}}</li>
-        {%endfor%}
+        <li>
+            <img src="{{url_for('get_avatar',filename=movie.avatar_m)}}" class="avatar">
+            {{movie.title}} - {{movie.year}}
+            <span class="float-right">
+                {%if current_user.is_authenticated %}
+                <a class="btn" href="{{url_for('edit',movie_id = movie.id)}}">编辑</a>
+                <form class="inline-form" method="post" action="{{url_for('delete',movie_id=movie.id)}}">
+                    <input class="btn" type="submit" name="delete" value="删除" onclick="return confirm('确定要删除嘛')">
+                </form>
+                {%endif%}
+                <a class="imdb" href="https://www.imdb.com/find?q={{ movie.title }}" target="_blank" title="Find this movie on IMDb">IMDb</a>
+            </span>
+        </li>
+    {%endfor%}
     </ul>
-    <footer>
-        <small>&copy; 2018 <a href="http://helloflask.com/book/3">HelloFlask</a></small> 
-    </footer>
-</body>
-</html>
+    {%if movies%}
+    {{render_pagination(pagination,align="center")}}
+    {%endif%}
+
+    <img alt="Walking Totoro" class="totoro" src="{{ url_for('static', filename='images/totoro.gif') }}" title="to~to~ro~">
+{%endblock%}
